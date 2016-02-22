@@ -75,6 +75,7 @@ exports.init = function (labels, cb) {
 		}).getView();
 		if (args.index == i) {
 			_highlight(btn);
+			btn.selected = true;
 		}
 		buttons.push(btn);
 		$.segCtrlButtonContainer.add(btn);
@@ -111,20 +112,44 @@ exports.init = function (labels, cb) {
 		if (buttons[clickedButton].disabled) {
 			return;
 		}
-		_.each(buttons, function (element, index, list) {
-			if (enabled) {
-				if (index == clickedButton) {
-					_highlight(element);
-				} else {
-					_unhighlight(element);
+		if(args.multiSelect === true){
+			//MultiSelect allows a user to select as many buttons as he wants
+			//multiSelectMaster allows a Master Button ("red pill") that is the "catch-all"
+			if(args.multiSelectMaster >= 0){
+				if (clickedButton !== args.multiSelectMaster){ 
+					_toggle(buttons[clickedButton]);
+					
+					//make sure red pill is deselected
+					exports.deselect(args.multiSelectMaster);
+				}else if(clickedButton === args.multiSelectMaster){
+					//user took the red pill, unselect all the things!! (except the red pill of course)
+					exports.deselectAll();
+					exports.select(args.multiSelectMaster);
 				}
+				//if user selected nothing, re-enable the default (MSII)
+				if(exports.getSelectedButtons().length < 1)
+					exports.select(args.multiSelectMaster);
+			}else{
+				//plain Jane, toggle her
+				_toggle(buttons[clickedButton]);	
 			}
-		});
+		}else{
+			_.each(buttons, function (element, index, list) {
+				if (enabled) {
+					if (index == clickedButton) {
+						_highlight(element);
+					} else {
+						_unhighlight(element);
+					}
+				}
+			});
+		}
 		callback({
 			index: clickedButton,
 			source: {
 				id: args.id || undefined
-			}
+			},
+			isMultiSelect: args.multiSelect === true ? true : false
 		});
 	});
 };
@@ -133,6 +158,7 @@ function _highlight(btn) {
 	if (btn) {
 		btn.backgroundColor = selectedButtonColor;
 		btn.color = selectedButtonTextColor;
+		btn.selected = true;
 	}
 }
 
@@ -140,12 +166,24 @@ function _unhighlight(btn) {
 	if (!btn.disabled) {
 		btn.backgroundColor = unselectedButtonColor;
 		btn.color = unselectedButtonTextColor;
+		btn.selected = false;
+	}
+}
+
+function _toggle(btn) {
+	if (!btn.selected) {
+		_highlight(btn);
+		btn.selected = true;
+	}else{
+		_unhighlight(btn);
+		btn.selected = false;
 	}
 }
 
 exports.select = function (num) {
 	var btnNumber = parseInt(num) || 0;
 	_highlight(buttons[btnNumber]);
+	buttons[btnNumber].selected = true;
 };
 exports.setIndex = function (num) {
 	var btnNumber = parseInt(num) || 0;
@@ -154,6 +192,7 @@ exports.setIndex = function (num) {
 exports.deselect = function (num) {
 	var btnNumber = parseInt(num) || 0;
 	_unhighlight(buttons[btnNumber]);
+	buttons[btnNumber].selected = false;
 };
 exports.enable = function () {
 	enabled = true;
@@ -162,7 +201,9 @@ exports.disable = function () {
 	enabled = false;
 };
 exports.deselectAll = function () {
-	_.each(buttons, _unhighlight);
+	_.each(buttons, function (element, index, list) {
+		exports.deselect(index);
+	});
 };
 
 exports.changeButtonLabels = function (arr) {
@@ -213,4 +254,16 @@ exports.enableAllButtons = function () {
 	for (var i = 0, j = buttons.length; i < j; i++) {
 		exports.enableButton(i);
 	}
+};
+
+/*
+Public function to get all selected buttons (assuming multiSelect is true)
+*/
+exports.getSelectedButtons = function(){
+	var result = [];
+	_.each(buttons, function (element, index, list) {
+		if (enabled && element.selected === true)
+			result.push(index);
+	});
+	return result;
 };
