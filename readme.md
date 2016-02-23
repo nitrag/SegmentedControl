@@ -11,7 +11,13 @@ Note: This widget uses a custom component on both iOS and Android. In other word
 
 ## Installation and usage
 
-Once this is indexed by Gitt.io you'll be able to install that way. Till then...
+### Recommended
+
+```shell
+$ gittio install com.skypanther.segmentedcontrol
+```
+
+###Manual method (works, but why not use gittio?):
 
 1. Download this repo (git clone, zip, whatever)
 2. Copy the widgets/com.skypanther.segmentedcontrol to your project's widgets folder
@@ -19,7 +25,7 @@ Once this is indexed by Gitt.io you'll be able to install that way. Till then...
 
 ```json
 "dependencies": {
-    "com.skypanther.segmentedcontrol": "1.0"
+    "com.skypanther.segmentedcontrol": "1.0.1"
 }
 ```
 
@@ -91,12 +97,20 @@ Additionally, most other properties you set on the widget (via its xml tag or id
 |`disableAllButtons()`|Disable all buttons, making them all unclickable. Essentially the same as `disable()`|
 |`enableAllButtons()`|Enable all buttons, making them all clickable unless you have called `disable()`. In that case, you'd need to call `enable()`|
 
+# History
+
+* 16-Feb-2016: Ver 1.0.3 resolves last button in set not filling entire area on iPhone 6s+
+* 08-Feb-2016: Ver 1.0.2 resolves issue where selecting/setIndexing a button didn't deselect the other buttons
+* 05-Feb-2016: Ver 1.0.1 resolves layout issues on larger iOS devices when using percentage-based widths
+* 29-Jan-2016: Initial release of the widget-ized version of my old Classic-style component
+* Ancient history, like 2011, initial release with a few interim releases thereafter
+
 # Limitations
 
 * I have not tested this with more than 3 buttons. Too many and it will surely fail. 
 * I haven't tested it on a tablet. Layout might be screwed up.
 * I'm pretty sure it won't handle rotation of the device well.
-* It doesn't support anything fancy, like icons instead of text on the buttons.
+* It doesn't support anything fancy, like icons instead of text on the buttons. Note: _it will support icon fonts for your text labels, so you can achieve a similar effect._
 
 Contributions are welcome!
 
